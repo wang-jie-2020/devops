@@ -1,0 +1,11 @@
+version: '3.1'
+services:
+  gitlab-runner:
+    build: environment # 指定Dockerfile文件来进行构建（或者直接使用镜像名）
+    restart: always  
+    container_name: gitlab-runner-java 
+    privileged: true  
+    volumes:
+      #- /usr/local/docker/runner/config:/etc/gitlab-runner  # gitlab-runner的配置
+      - ./config:/etc/gitlab-runner  # gitlab-runner的配置
+      - /var/run/docker.sock:/var/run/docker.sock  # 挂载的是容器中的docker跟宿主机docker的配置 ,目的是让容器中也可以操作宿主机中的docker

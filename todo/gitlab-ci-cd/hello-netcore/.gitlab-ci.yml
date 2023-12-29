@@ -1,0 +1,38 @@
+stages:
+  - build
+  - push
+  - clean
+  - run
+
+
+build:
+  stage: build
+  only:
+    - master
+  script:
+    - docker build -t hello-netcore -f empty/Dockerfile .
+
+push:
+  stage: push
+  only:
+    - master
+  script:
+    - echo "push image"
+    #- docker login --username=wangjie890303 registry.cn-hangzhou.aliyuncs.com
+    #- docker tag hello-netcore registry.cn-hangzhou.aliyuncs.com/gitlab-ci-demo/hello-netcore
+    #- docker push registry.cn-hangzhou.aliyuncs.com/gitlab-ci-demo/hello-netcore
+
+clean:
+  stage: clean
+  only:
+    - master
+  script:
+    - docker rmi $(docker images -q -f dangling=true)
+
+run:
+  stage: run
+  only:
+    - master
+  script:
+    -  docker run -p 8000:80 --name hello-netcore -d hello-netcore
+    

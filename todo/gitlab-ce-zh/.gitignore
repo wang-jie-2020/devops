@@ -1,0 +1,5 @@
+*.diff
+gitlab/*
+gitlab-*
+*.log
+tmp

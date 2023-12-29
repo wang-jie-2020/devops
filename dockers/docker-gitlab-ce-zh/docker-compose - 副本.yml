@@ -1,0 +1,38 @@
+version: '2'
+services:
+    gitlab:
+      image: 'twang2218/gitlab-ce-zh:11.1.4'
+      restart: unless-stopped
+      # wj hostname有域名可以用域名,不然用ip,或者修改/etc/hosts方便测试
+      hostname: 'mycloud.tencent.com'    
+      environment:
+        TZ: 'Asia/Shanghai'
+        GITLAB_OMNIBUS_CONFIG: |
+          # wj external_url保持与hostname一致
+          external_url 'http://mycloud.tencent.com'  
+          gitlab_rails['time_zone'] = 'Asia/Shanghai'
+          # 需要配置到 gitlab.rb 中的配置可以在这里配置，每个配置一行，注意缩进。
+          # 比如下面的电子邮件的配置：
+          # gitlab_rails['smtp_enable'] = true
+          # gitlab_rails['smtp_address'] = "smtp.exmail.qq.com"
+          # gitlab_rails['smtp_port'] = 465
+          # gitlab_rails['smtp_user_name'] = "xxxx@xx.com"
+          # gitlab_rails['smtp_password'] = "password"
+          # gitlab_rails['smtp_authentication'] = "login"
+          # gitlab_rails['smtp_enable_starttls_auto'] = true
+          # gitlab_rails['smtp_tls'] = true
+          # gitlab_rails['gitlab_email_from'] = 'xxxx@xx.com'
+      ports:
+        - '8002:80'
+        - '443:443'
+        # wj 宿主机的22端口是ssh，要么修改ssh端口要么修改映射
+        - '2222:22'   
+      volumes:
+        - config:/etc/gitlab
+        - data:/var/opt/gitlab
+        - logs:/var/log/gitlab
+volumes:
+    # wj 官方是设置在这个目录的，还建议增加宿主机环境变量export GITLAB_HOME=/srv/gitlab，感觉没必要吧
+    config:
+    data:
+    logs:

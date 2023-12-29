@@ -1,0 +1,16 @@
+stages:
+  - dev-only
+  - master-go
+
+dev-only:
+  stage: dev-only
+  only:
+    - dev
+  script:
+    - echo "dev-only"
+
+master-go:
+  stage: master-go
+  script:
+    - echo "dev-not-go"
+    - echo "master-go"
