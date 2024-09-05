@@ -1,0 +1,66 @@
+version: '3.3'
+services:
+  es8:
+    image: elasticsearch:8.4.2
+    container_name: es8
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      xpack.security.enabled: "false"
+      discovery.type: "single-node" #单例模式
+      ingest.geoip.downloader.enabled: "false"
+      #锁定物理内存地址，防止es内存被交换出去，也就是避免es使用swap交换分区，频繁的交换，会导致IOPS变高
+      bootstrap.memory_lock: "true"
+      ES_JAVA_OPTS: "-Xms3g -Xmx3g" #堆内存大小，设置为彼此相等，不超过物理内存50%
+      TZ: Asia/Shanghai
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+ 
+  skywalking-oap:
+    image: apache/skywalking-oap-server:9.3.0
+    container_name: skywalking-oap
+    restart: always
+    depends_on:
+      - es8
+    links:
+      - es8
+    ports:
+      - 11800:11800
+      - 12800:12800
+    environment:
+      SW_CORE_RECORD_DATA_TTL: 7 #记录数据的有效期，单位天
+      SW_CORE_METRICS_DATA_TTL: 7 #分析指标数据的有效期，单位天
+      SW_ENABLE_UPDATE_UI_TEMPLATE: "true" # 开启dashboard编辑修改功能
+      SW_HEALTH_CHECKER: default
+      TZ: Asia/Shanghai
+      SW_STORAGE: elasticsearch
+      JAVA_OPTS: "-Xms2048m -Xmx2048m"
+      #SW_STORAGE: elasticsearch7
+      SW_STORAGE_ES_CLUSTER_NODES: es8:9200
+    #volumes:
+      #- ./config:/skywalking/config
+ 
+  skywalking-ui:
+    image: apache/skywalking-ui:9.3.0
+    #image: apache/skywalking-ui:9.0.0
+    container_name: skywalking-ui
+    restart: always
+    depends_on:
+      - skywalking-oap
+    links:
+      - skywalking-oap
+    ports:
+      - 8080:8080
+    environment:
+      TZ: Asia/Shanghai
+      SW_HEALTH_CHECKER: default
+      SW_OAP_ADDRESS: http://skywalking-oap:12800
+ 
+volumes:
+  esdata:
+ 
