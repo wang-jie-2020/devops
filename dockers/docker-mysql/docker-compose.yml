@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_HOST: '%'
-      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: 123!@#
       #MYSQL_DATABASE: itdragons
       #MYSQL_USER: itdragons
       #MYSQL_PASSWORD: 123!@# 
